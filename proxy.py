@@ -3,7 +3,16 @@ import requests
 
 app = Flask(__name__)
 
-@app.route('/', defaults={'path': ''})
+@app.route('/', methods=["GET"])
+def home():
+    return '''
+    <h2>🛰️ YouTube Proxy is Running!</h2>
+    <p>Use like this:</p>
+    <code>/www.youtube.com</code><br><br>
+    <b>Example:</b><br>
+    <a href="/www.youtube.com">/www.youtube.com</a>
+    '''
+
 @app.route('/<path:path>', methods=["GET", "POST"])
 def proxy(path):
     target_url = f'https://{path}'
@@ -14,7 +23,9 @@ def proxy(path):
             headers={key: value for (key, value) in request.headers if key.lower() != 'host'},
             data=request.get_data(),
             cookies=request.cookies,
-            allow_redirects=False)
+            allow_redirects=False,
+            stream=True
+        )
 
         excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
         headers = [(name, value) for (name, value) in resp.raw.headers.items()
